@@ -1,28 +1,31 @@
 import './pacientes.css';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { listPacientes, getPaciente } from '../services/pacientes'; 
 import NavBar from '../components/NavBar';
 
-
+// ===== Página: Lista de Pacientes =====
 export default function PacientesList() {
+  // ----- Estado: datos, mensajes, carga -----
   const [items, setItems] = useState([]);
   const [msg, setMsg] = useState('');
   const [loading, setLoading] = useState(true);
 
+  // ----- Estado: paginación -----
   const [page, setPage] = useState(1);
   const size = 4;
   const [totalPages, setTotalPages] = useState(1);
 
+  // ----- Estado: filtro por ID -----
   const [filterId, setFilterId] = useState('');
 
+  // ----- Carga de datos (paginado o por ID) -----
   const load = async (p = page) => {
     try {
       setLoading(true);
       const id = (filterId || '').trim();
 
       if (id) {
-        // Buscar por ID usando getPaciente
+        // Buscar 1 paciente por ID
         try {
           const one = await getPaciente(id);
           const rows = one ? [one] : [];
@@ -41,7 +44,7 @@ export default function PacientesList() {
           }
         }
       } else {
-        // Listado paginado normal
+        // Listado paginado
         const data = await listPacientes({ page: p, size });
         const rows = data.data || [];
         const total = data.total ?? rows.length;
@@ -57,11 +60,12 @@ export default function PacientesList() {
     }
   };
 
-
+  // ----- Efecto: carga inicial -----
   useEffect(() => {
     load(1);
   }, []);
 
+  // ----- Util: formateo de fecha -----
   const formatDate = (s) => {
     if (!s) return '-';
     const d = new Date(s);
@@ -70,23 +74,28 @@ export default function PacientesList() {
       : d.toLocaleDateString('es-CO', { year: 'numeric', month: '2-digit', day: '2-digit' });
   };
 
+  // ----- Util: nombre completo -----
   const fullName = (p) =>
     [p.primer_nombre, p.segundo_nombre, p.primer_apellido, p.segundo_apellido]
       .filter(Boolean)
       .join(' ');
 
+  // ----- Util: páginas a mostrar -----
   const pages = (() => {
     const total = Math.min(totalPages, 10);
     return Array.from({ length: total }, (_, i) => i + 1);
   })();
 
+  // ===== Render =====
   return (
     <div className="pacientes-bg">
+      {/* Nav con título de sección */}
       <NavBar title="Pacientes" />
 
       <main className="pacientes-main">
         <div className="pacientes-container">
 
+          {/* Toolbar de filtro por ID */}
           <div className="pacientes-toolbar">
             <input
               type="number"
@@ -108,6 +117,7 @@ export default function PacientesList() {
             )}
           </div>
 
+          {/* Lista: skeleton o tarjetas */}
           {loading ? (
             <div className="pacientes-grid">
               {Array.from({ length: 4 }).map((_, i) => (
@@ -144,6 +154,7 @@ export default function PacientesList() {
             </div>
           )}
 
+          {/* Paginación inferior */}
           <nav className="pagination">
             <button
               className="page-nav"
@@ -176,6 +187,7 @@ export default function PacientesList() {
             </button>
           </nav>
 
+          {/* Mensaje de estado */}
           <div className="pacientes-msg">{msg}</div>
         </div>
       </main>

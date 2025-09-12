@@ -11,7 +11,7 @@ import {
 } from '../services/pacientes';
 import NavBar from '../components/NavBar';
 
-
+/* ===== Esquema de validación (zod) ===== */
 const schema = z.object({
   numero_documento: z.string().min(3, 'Requerido'),
   tipo_documento: z.enum(['CC', 'TI', 'CE', 'PA'], { required_error: 'Requerido' }),
@@ -19,13 +19,15 @@ const schema = z.object({
   segundo_nombre: z.string().optional(),
   primer_apellido: z.string().min(1, 'Requerido'),
   segundo_apellido: z.string().optional(),
-  fecha_nacimiento: z.string().min(1, 'Requerido'), 
+  fecha_nacimiento: z.string().min(1, 'Requerido'),
   email: z.string().email('Email inválido'),
   telefono: z.string().min(7, 'Requerido'),
   direccion: z.string().min(3, 'Requerido'),
 });
 
+/* ===== Página: Gestionar Pacientes ===== */
 export default function Pacientes() {
+  /* ----- Estado: mensajes, listado, paginación, edición ----- */
   const [msg, setMsg] = useState('');
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(1);
@@ -35,6 +37,7 @@ export default function Pacientes() {
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
+  /* ----- React Hook Form: registro + validación ----- */
   const {
     register,
     handleSubmit,
@@ -57,6 +60,7 @@ export default function Pacientes() {
     },
   });
 
+  /* ----- Carga de datos con paginación ----- */
   const load = async (p = page) => {
     try {
       setLoading(true);
@@ -72,10 +76,12 @@ export default function Pacientes() {
     }
   };
 
+  /* ----- Efecto: carga inicial ----- */
   useEffect(() => {
     load(1);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  /* ----- Handlers: crear/actualizar ----- */
   const onSubmit = async (form) => {
     setMsg('');
     try {
@@ -94,6 +100,7 @@ export default function Pacientes() {
     }
   };
 
+  /* ----- Handlers: editar, cancelar, eliminar ----- */
   const onEdit = (p) => {
     setEditingId(p.id);
     Object.entries({
@@ -126,148 +133,158 @@ export default function Pacientes() {
     }
   };
 
+  /* ===== Render ===== */
   return (
     <div className="manage-bg">
+      {/* Nav superior */}
       <NavBar title="Gestionar" />
+
       <main className="manage-main">
+        {/* Contenedor centrado */}
         <div className="manage-wrapper">
-        <section className="manage-card">
-          <h2 className="manage-card-title">{editingId ? 'Editar paciente' : 'Crear paciente'}</h2>
+          {/* ----- Card: formulario crear/editar ----- */}
+          <section className="manage-card">
+            <h2 className="manage-card-title">{editingId ? 'Editar paciente' : 'Crear paciente'}</h2>
 
-          <form className="manage-form" onSubmit={handleSubmit(onSubmit)}>
-            <label>
-              <span>Documento</span>
-              <input {...register('numero_documento')} placeholder="1234567890" />
-              {errors.numero_documento && <small className="err">{errors.numero_documento.message}</small>}
-            </label>
+            <form className="manage-form" onSubmit={handleSubmit(onSubmit)}>
+              {/* Campos básicos */}
+              <label>
+                <span>Documento</span>
+                <input {...register('numero_documento')} placeholder="1234567890" />
+                {errors.numero_documento && <small className="err">{errors.numero_documento.message}</small>}
+              </label>
 
-            <label>
-              <span>Tipo</span>
-              <select {...register('tipo_documento')}>
-                <option value="CC">CC</option>
-                <option value="TI">TI</option>
-                <option value="CE">CE</option>
-                <option value="PA">PA</option>
-              </select>
-              {errors.tipo_documento && <small className="err">{errors.tipo_documento.message}</small>}
-            </label>
+              <label>
+                <span>Tipo</span>
+                <select {...register('tipo_documento')}>
+                  <option value="CC">CC</option>
+                  <option value="TI">TI</option>
+                  <option value="CE">CE</option>
+                  <option value="PA">PA</option>
+                </select>
+                {errors.tipo_documento && <small className="err">{errors.tipo_documento.message}</small>}
+              </label>
 
-            <label>
-              <span>Teléfono</span>
-              <input {...register('telefono')} placeholder="3001234567" />
-              {errors.telefono && <small className="err">{errors.telefono.message}</small>}
-            </label>
+              <label>
+                <span>Teléfono</span>
+                <input {...register('telefono')} placeholder="3001234567" />
+                {errors.telefono && <small className="err">{errors.telefono.message}</small>}
+              </label>
 
-            <label>
-              <span>Dirección</span>
-              <input {...register('direccion')} placeholder="Calle 123 #45-67" />
-              {errors.direccion && <small className="err">{errors.direccion.message}</small>}
-            </label>
+              <label>
+                <span>Dirección</span>
+                <input {...register('direccion')} placeholder="Calle 123 #45-67" />
+                {errors.direccion && <small className="err">{errors.direccion.message}</small>}
+              </label>
 
-            <label>
-              <span>Fecha de nacimiento</span>
-              <input type="date" {...register('fecha_nacimiento')} />
-              {errors.fecha_nacimiento && <small className="err">{errors.fecha_nacimiento.message}</small>}
-            </label>
+              <label>
+                <span>Fecha de nacimiento</span>
+                <input type="date" {...register('fecha_nacimiento')} />
+                {errors.fecha_nacimiento && <small className="err">{errors.fecha_nacimiento.message}</small>}
+              </label>
 
-            <label>
-              <span>Primer nombre</span>
-              <input {...register('primer_nombre')} />
-              {errors.primer_nombre && <small className="err">{errors.primer_nombre.message}</small>}
-            </label>
+              <label>
+                <span>Primer nombre</span>
+                <input {...register('primer_nombre')} />
+                {errors.primer_nombre && <small className="err">{errors.primer_nombre.message}</small>}
+              </label>
 
-            <label>
-              <span>Segundo nombre</span>
-              <input {...register('segundo_nombre')} />
-            </label>
+              <label>
+                <span>Segundo nombre</span>
+                <input {...register('segundo_nombre')} />
+              </label>
 
-            <label>
-              <span>Primer apellido</span>
-              <input {...register('primer_apellido')} />
-              {errors.primer_apellido && <small className="err">{errors.primer_apellido.message}</small>}
-            </label>
+              <label>
+                <span>Primer apellido</span>
+                <input {...register('primer_apellido')} />
+                {errors.primer_apellido && <small className="err">{errors.primer_apellido.message}</small>}
+              </label>
 
-            <label>
-              <span>Segundo apellido</span>
-              <input {...register('segundo_apellido')} />
-            </label>
+              <label>
+                <span>Segundo apellido</span>
+                <input {...register('segundo_apellido')} />
+              </label>
 
-            <label className="span-3">
-              <span>Email</span>
-              <input type="email" {...register('email')} placeholder="correo@dominio.com" />
-              {errors.email && <small className="err">{errors.email.message}</small>}
-            </label>
+              {/* Campo email en la misma fila (span-3) */}
+              <label className="span-3">
+                <span>Email</span>
+                <input type="email" {...register('email')} placeholder="correo@dominio.com" />
+                {errors.email && <small className="err">{errors.email.message}</small>}
+              </label>
 
-            <div className="manage-actions">
-              {editingId && (
-                <button type="button" className="btn-secondary" onClick={onCancelEdit}>
-                  Cancelar
+              {/* Acciones del formulario */}
+              <div className="manage-actions">
+                {editingId && (
+                  <button type="button" className="btn-secondary" onClick={onCancelEdit}>
+                    Cancelar
+                  </button>
+                )}
+                <button type="submit" className="btn-primary">
+                  {editingId ? 'Actualizar' : 'Crear'}
                 </button>
-              )}
-              <button type="submit" className="btn-primary">
-                {editingId ? 'Actualizar' : 'Crear'}
+              </div>
+            </form>
+
+            {/* Mensajes del formulario */}
+            {msg && <div className="manage-msg">{msg}</div>}
+          </section>
+
+          {/* ----- Tabla: listado de pacientes ----- */}
+          <section className="manage-table">
+            <h2 className="manage-table-title">Listado</h2>
+
+            <div className="table-wrap">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>id</th>
+                    <th>primer nombre</th>
+                    <th>Segundo nombre</th>
+                    <th>Primer apellido</th>
+                    <th>Segundo apellido</th>
+                    <th>Documento</th>
+                    <th>Tipo</th>
+                    <th>Dirección</th>
+                    <th>Teléfono</th>
+                    <th>Email</th>
+                    <th>acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((p) => (
+                    <tr key={p.id}>
+                      <td>{p.id}</td>
+                      <td>{p.primer_nombre}</td>
+                      <td>{p.segundo_nombre}</td>
+                      <td>{p.primer_apellido}</td>
+                      <td>{p.segundo_apellido}</td>
+                      <td>{p.numero_documento}</td>
+                      <td>{p.tipo_documento}</td>
+                      <td>{p.direccion}</td>
+                      <td>{p.telefono}</td>
+                      <td>{p.email}</td>
+                      <td className="td-actions">
+                        <button className="btn-mini" onClick={() => onEdit(p)}>editar</button>
+                        <button className="btn-danger-mini" onClick={() => onDelete(p.id)}>eliminar</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Paginación inferior */}
+            <div className="pager">
+              <button onClick={() => load(Math.max(1, page - 1))} disabled={page <= 1}>
+                Anterior
+              </button>
+              <span>Página {page} de {totalPages}</span>
+              <button onClick={() => load(Math.min(totalPages, page + 1))} disabled={page >= totalPages}>
+                Siguiente
               </button>
             </div>
-          </form>
-
-          {msg && <div className="manage-msg">{msg}</div>}
-        </section>
-
-        <section className="manage-table">
-          <h2 className="manage-table-title">Listado</h2>
-
-          <div className="table-wrap">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>id</th>
-                  <th>primer nombre</th>
-                  <th>Segundo nombre</th>
-                  <th>Primer apellido</th>
-                  <th>Segundo apellido</th>
-                  <th>Documento</th>
-                  <th>Tipo</th>
-                  <th>Dirección</th>
-                  <th>Teléfono</th>
-                  <th>Email</th>
-                  <th>acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((p) => (
-                  <tr key={p.id}>
-                    <td>{p.id}</td>
-                    <td>{p.primer_nombre}</td>
-                    <td>{p.segundo_nombre}</td>
-                    <td>{p.primer_apellido}</td>
-                    <td>{p.segundo_apellido}</td>
-                    <td>{p.numero_documento}</td>
-                    <td>{p.tipo_documento}</td>
-                    <td>{p.direccion}</td>
-                    <td>{p.telefono}</td>
-                    <td>{p.email}</td>
-                    <td className="td-actions">
-                      <button className="btn-mini" onClick={() => onEdit(p)}>editar</button>
-                      <button className="btn-danger-mini" onClick={() => onDelete(p.id)}>eliminar</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="pager">
-            <button onClick={() => load(Math.max(1, page - 1))} disabled={page <= 1}>
-              Anterior
-            </button>
-            <span>Página {page} de {totalPages}</span>
-            <button onClick={() => load(Math.min(totalPages, page + 1))} disabled={page >= totalPages}>
-              Siguiente
-            </button>
-          </div>
-        </section>
+          </section>
         </div>
-
       </main>
     </div>
   );

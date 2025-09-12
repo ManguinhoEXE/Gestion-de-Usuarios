@@ -7,27 +7,31 @@ import { useNavigate, Link } from 'react-router-dom';
 import { login as loginApi } from '../services/auth';
 import logo from '../assets/logo.png';
 
-
+// ===== Esquema de validación (zod) =====
 const schema = z.object({
   email: z.string().min(1, 'Email requerido').email('Email inválido'),
   password: z.string().min(1, 'Password requerido'),
 });
 
 export default function Login() {
+  // ===== Hooks de navegación y estado local =====
   const navigate = useNavigate();
   const [msg, setMsg] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // ===== Efecto: bloquear scroll de fondo en la vista de login =====
   useEffect(() => {
     document.body.classList.add('no-scroll');
     return () => document.body.classList.remove('no-scroll');
   }, []);
 
+  // ===== Form: registro de campos + validación =====
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
     defaultValues: { email: '', password: '' },
   });
-  
 
+  // ===== Submit: llama API, maneja errores y redirige =====
   const onSubmit = async ({ email, password }) => {
     setMsg('');
     setLoading(true);
@@ -41,15 +45,19 @@ export default function Login() {
     }
   };
 
+  // ===== Render: layout, encabezado y formulario =====
   return (
-    <div className="login-bg">
-      <div className="login-card">
+    <div className="login-bg">{/* Fondo/centro */}
+      <div className="login-card">{/* Tarjeta del login */}
+        {/* Encabezado: logo + título */}
         <div className="login-header">
           <img className="login-logo" src={logo} alt="logo" />
           <h1 className="login-title">Iniciar Sesión</h1>
         </div>
 
+        {/* Formulario: email y contraseña */}
         <form className="login-form" onSubmit={handleSubmit(onSubmit)}>
+          {/* Campo email */}
           <label className="login-label">Email</label>
           <input
             type="email"
@@ -59,6 +67,7 @@ export default function Login() {
           />
           {errors.email && <div className="error-msg">{errors.email.message}</div>}
 
+          {/* Campo contraseña */}
           <label className="login-label">Contraseña</label>
           <input
             type="password"
@@ -68,6 +77,7 @@ export default function Login() {
           />
           {errors.password && <div className="error-msg">{errors.password.message}</div>}
 
+          {/* Acciones: enviar y enlace a registro + mensaje de error */}
           <div className="login-actions">
             <button type="submit" className="login-button" disabled={loading}>
               {loading ? 'Ingresando…' : 'Iniciar'}

@@ -15,10 +15,8 @@ git clone https://github.com/ManguinhoEXE/Gestion-de-Usuarios.git
 2) Backend (server)
 ```powershell
 cd server
-# crea .env desde el ejemplo (PowerShell)
-Copy-Item .env.example .env
 npm install
-npm run dev   # o: node index.js
+npm run dev
 ```
 
 Crear base de datos (psql):
@@ -29,8 +27,6 @@ CREATE DATABASE gestion_pacientes;
 3) Frontend (client)
 ```powershell
 cd ../client
-# crea .env.local desde el ejemplo
-Copy-Item .env.example .env.local
 npm install
 npm run dev
 ```
@@ -38,7 +34,7 @@ npm run dev
 Ejemplo de .env.local (client):
 ```env
 # URL base del backend
-VITE_API_URL=http://localhost:3000/api
+VITE_API_URL= URL
 ```
 
 ## Estructura
@@ -60,16 +56,6 @@ gestion-pacientes/
    └─ .gitignore         
 ```
 
-
-## API
-
-Usa cookies para mantener sesión:
-- Guarda cookies con `-c cookies.txt` y reutilízalas con `-b cookies.txt`.
-
-Base URL:
-```bash
-API=http://localhost:3000/api
-```
 
 Postman Link
 ```bash
